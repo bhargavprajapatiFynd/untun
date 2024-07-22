@@ -96,6 +96,21 @@ export function startCloudflaredTunnel(
       const [, idx] = indexMatch;
       connectionResolvers[+idx]?.({ id, ip, location });
     }
+
+    const connectedRegex = /Registered tunnel connection/;
+    const disconnectRegex = /Unregistered tunnel connection/;
+    const retryConnectionRegex = /Retrying connection in up to/;
+    for(const strLine of str.split("\n")) {
+      if(connectedRegex.test(strLine)){
+          console.log("Cloudflare tunnel connection established")
+      }
+      else if(disconnectRegex.test(strLine)){
+          console.log("Cloudflare tunnel disconnected")
+      }
+      else if(retryConnectionRegex.test(strLine)){
+          console.log(`Retrying to connect cloudflare tunnel...`);
+      }
+    }
   };
   child.stdout.on("data", parser).on("error", urlRejector);
   child.stderr.on("data", parser).on("error", urlRejector);
